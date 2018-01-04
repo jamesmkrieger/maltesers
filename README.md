@@ -3,7 +3,7 @@ A set of python scripts for carrying out the dimer interface analysis originally
 
 These scripts now allow this analysis to be done in PyMOL and easily generate the final images.
 
-After running the maltesers command in PyMOL, you end up with two images, which can then be combined with the following python commands:
+After running the maltesers command in PyMOL, you end up with two images, which can then be combined with the following python commands or in an image editer:
 
     # combine the images for chain 1 to make the maltesers image
     spheres_1 = cv2.imread(pdbcode + midString1 + '_' + chain1 + '_spheres.png',1)
