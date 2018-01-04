@@ -1,11 +1,13 @@
 """
 DESCRIPTION:
 Given an NTD dimer and two chain IDs, do the maltesers analysis of Sukumaran et al., EMBO J 2011:
-1. find the interface atoms (within 4.5 Å) in both lobes using the findint function from findint_lobes.py
+1. find the interface atoms (within 4.5 A) in both lobes using the findint function from findint_lobes.py
 2. calculate the numbers of contacts and make an image showing them coloured red to blue by 
 colouring by B-factor using the CBF function from CBF.py and also make an image of the interface surface
 3. print out the local contact density as defined by Bahadur et al., J Mol Biol 2004 
 using the LD function from LD.py
+
+The process would need to be completed by combining the images together with opencv module cv2.
 
 USAGE:
 maltesers pdbcode, chain1, chain2, reversechains
@@ -35,8 +37,10 @@ maltesers 3o21, A, B
 AUTHOR:
 James Krieger
 """
-from pymol import *
+pdbdir = "/home/jkrieger/Documents/pdbs/PBPs/iGluR/ampar/ntd/IF_things/"
 
+from pymol import *
+import os
 from findint_lobes import findint
 from CBF import CBF
 from LD import LD
@@ -44,6 +48,7 @@ from LD import LD
 def maltesers(pdbcode,chain1,chain2,reversechains=-1):
     cmd.disable()
     cmd.set('auto_zoom',0)
+    cmd.set('ray_shadows','off')
 
     if int(reversechains) == 0:
         midString1 = '_' + chain1 + chain2
@@ -97,12 +102,13 @@ def maltesers(pdbcode,chain1,chain2,reversechains=-1):
     cmd.disable(pdbcode + midString2 + '_' + chain2)
     CBF(pdbcode,chain1,chain2,'UL',reversechains)
     CBF(pdbcode,chain1,chain2,'LL',reversechains)
-    cmd.load('Documents/pdbs/UL_IF_' + pdbcode + midString1 + '_' + chain1 + '_CBF')
-    cmd.load('Documents/pdbs/LL_IF_' + pdbcode + midString1 + '_' + chain1 + '_CBF')
+    cmd.load(pdbdir + 'UL_IF_' + pdbcode + midString1 + '_' + chain1 + '_CBF.pdb')
     cmd.show_as('spheres','UL_IF_' + pdbcode + midString1 + '_' + chain1 + '_CBF')
-    cmd.show_as('spheres','LL_IF_' + pdbcode + midString1 + '_' + chain1 + '_CBF')
     cmd.spectrum('b','blue_red','UL_IF_' + pdbcode + midString1 + '_' + chain1 + '_CBF',1,7)
-    cmd.spectrum('b','blue_red','LL_IF_' + pdbcode + midString1 + '_' + chain1 + '_CBF',1,7)
+    if os.path.isfile(pdbdir + 'LL_IF_' + pdbcode + midString1 + '_' + chain1 + '_CBF.pdb'):
+        cmd.load(pdbdir + 'LL_IF_' + pdbcode + midString1 + '_' + chain1 + '_CBF.pdb')
+        cmd.show_as('spheres','LL_IF_' + pdbcode + midString1 + '_' + chain1 + '_CBF')
+        cmd.spectrum('b','blue_red','LL_IF_' + pdbcode + midString1 + '_' + chain1 + '_CBF',1,7)
     cmd.set_view('''\
     -0.344349116,   -0.499494404,    0.794939816,\
      0.360954791,    0.711206675,    0.603238463,\
@@ -115,15 +121,16 @@ def maltesers(pdbcode,chain1,chain2,reversechains=-1):
 
     # make the coloured spheres image for chain 2
     cmd.disable('UL_IF_' + pdbcode + midString1 + '_' + chain1 + '_CBF')
-    cmd.disable('LL_IF_' + pdbcode + midString1 + '_' + chain1 + '_CBF')
     CBF(pdbcode,chain2,chain1,'UL',reversechains)
-    CBF(pdbcode,chain2,chain1,'LL',reversechains)
-    cmd.load('Documents/pdbs/UL_IF_' + pdbcode + midString2 + '_' + chain2 + '_CBF')
-    cmd.load('Documents/pdbs/LL_IF_' + pdbcode + midString2 + '_' + chain2 + '_CBF')
+    cmd.load(pdbdir + 'UL_IF_' + pdbcode + midString2 + '_' + chain2 + '_CBF.pdb')
     cmd.show_as('spheres','UL_IF_' + pdbcode + midString2 + '_' + chain2 + '_CBF')
-    cmd.show_as('spheres','LL_IF_' + pdbcode + midString2 + '_' + chain2 + '_CBF')
     cmd.spectrum('b','blue_red','UL_IF_' + pdbcode + midString2 + '_' + chain2 + '_CBF',1,7)
-    cmd.spectrum('b','blue_red','LL_IF_' + pdbcode + midString2 + '_' + chain2 + '_CBF',1,7)
+    if os.path.isfile(pdbdir + 'LL_IF_' + pdbcode + midString1 + '_' + chain1 + '_CBF.pdb'):
+        cmd.disable('LL_IF_' + pdbcode + midString1 + '_' + chain1 + '_CBF')
+        CBF(pdbcode,chain2,chain1,'LL',reversechains)
+        cmd.load(pdbdir + 'LL_IF_' + pdbcode + midString2 + '_' + chain2 + '_CBF.pdb')
+        cmd.show_as('spheres','LL_IF_' + pdbcode + midString2 + '_' + chain2 + '_CBF')
+        cmd.spectrum('b','blue_red','LL_IF_' + pdbcode + midString2 + '_' + chain2 + '_CBF',1,7)
     cmd.set_view('''\
     -0.344349116,   -0.499494404,    0.794939816,\
      0.360954791,    0.711206675,    0.603238463,\
@@ -137,13 +144,13 @@ def maltesers(pdbcode,chain1,chain2,reversechains=-1):
 
     # show the LD values
     LD(pdbcode,chain1,chain2,'UL',reversechains)
-    fi = open('Documents/pdbs/UL_IF_' + pdbcode + midString1 + '_' + chain1 + '_LD','r')
+    fi = open(pdbdir + 'UL_IF_' + pdbcode + midString1 + '_' + chain1 + '_LD.txt','r')
     lines = fi.readlines()
     fi.close()
     UL_LD_1 = float(lines[-1])
 
     LD(pdbcode,chain2,chain1,'UL',reversechains)
-    fi = open('Documents/pdbs/UL_IF_' + pdbcode + midString2 + '_' + chain2 + '_LD','r')
+    fi = open(pdbdir + 'UL_IF_' + pdbcode + midString2 + '_' + chain2 + '_LD.txt','r')
     lines = fi.readlines()
     fi.close()
     UL_LD_2 = float(lines[-1])
@@ -151,13 +158,13 @@ def maltesers(pdbcode,chain1,chain2,reversechains=-1):
     print (UL_LD_1 + UL_LD_2)/2.
 
     LD(pdbcode,chain1,chain2,'LL',reversechains)
-    fi = open('Documents/pdbs/LL_IF_' + pdbcode + midString1 + '_' + chain1 + '_LD','r')
+    fi = open(pdbdir + 'LL_IF_' + pdbcode + midString1 + '_' + chain1 + '_LD.txt','r')
     lines = fi.readlines()
     fi.close()
     LL_LD_1 = float(lines[-1])
 
     LD(pdbcode,chain2,chain1,'LL',reversechains)
-    fi = open('Documents/pdbs/LL_IF_' + pdbcode + midString2 + '_' + chain2 + '_LD','r')
+    fi = open(pdbdir + 'LL_IF_' + pdbcode + midString2 + '_' + chain2 + '_LD.txt','r')
     lines = fi.readlines()
     fi.close()
     LL_LD_2 = float(lines[-1])
@@ -165,5 +172,5 @@ def maltesers(pdbcode,chain1,chain2,reversechains=-1):
     print (LL_LD_1 + LL_LD_2)/2.
 
     cmd.delete('3hsy')
-
+    
 cmd.extend('maltesers',maltesers)

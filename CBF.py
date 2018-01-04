@@ -9,23 +9,25 @@ reversechains can take 0 or 1 or -1. 0 is the default
 '''
 from pymol import *
 
+pdbdir = "/home/jkrieger/Documents/pdbs/PBPs/IFs/"
+
 def CBF(pdbcode,chain1,chain2,lobe,reversechains=0):
-	fi = open('Documents/pdbs/' + lobe + '_IF_' + pdbcode + '_' + chain1 + '.pdb','r')
+	fi = open(pdbdir + lobe + '_IF_' + pdbcode + '_' + chain1 + '.pdb','r')
 	for line in fi:
 		if line.find('ATOM') == 0:
 			resid = line.split()[5]
 			atomName = line.split()[2]
 			if int(reversechains) == 0:
-				fo = open('Documents/pdbs/' + lobe + '_IF_' + pdbcode + '_' + chain1 + chain2 + '_' + chain1 + '_CBF','a')
-				fo.write(line[:61] + str(cmd.count_atoms(pdbcode + "_" + chain1 + chain2 + " and chain " + chain2 + " within 4.5 of /" + pdbcode + "_" + chain1 + chain2 + "//" + chain1 + "/" + resid + "/" + atomName)).rjust(5) + line[66:])
+				fo = open(pdbdir + lobe + '_IF_' + pdbcode + '_' + chain1 + chain2 + '_' + chain1 + '_CBF.pdb','a')
+				fo.write(line[:60] + str(cmd.count_atoms(pdbcode + "_" + chain1 + chain2 + " and chain " + chain2 + " within 4.5 of /" + pdbcode + "_" + chain1 + chain2 + "//" + chain1 + "/" + resid + "/" + atomName)).rjust(6) + line[66:])
 				fo.close()
 			elif int(reversechains) == 1:
-                                fo = open('Documents/pdbs/' + lobe + '_IF_' + pdbcode + '_' + chain2 + chain1 + '_' + chain1 + '_CBF','a')
-                                fo.write(line[:61] + str(cmd.count_atoms(pdbcode + "_" + chain2 + chain1 + " and chain " + chain2 + " within 4.5 of /" + pdbcode + "_" + chain2 + chain1 + "//" + chain1 + "/" + resid + "/" + atomName)).rjust(5) + line[66:])
+                                fo = open(pdbdir + lobe + '_IF_' + pdbcode + '_' + chain2 + chain1 + '_' + chain1 + '_CBF.pdb','a')
+                                fo.write(line[:60] + str(cmd.count_atoms(pdbcode + "_" + chain2 + chain1 + " and chain " + chain2 + " within 4.5 of /" + pdbcode + "_" + chain2 + chain1 + "//" + chain1 + "/" + resid + "/" + atomName)).rjust(6) + line[66:])
 				fo.close()
 			elif int(reversechains) == -1:
-				fo = open('Documents/pdbs/' + lobe + '_IF_' + pdbcode + '_' + chain1 + '_CBF','a')
-                                fo.write(line[:61] + str(cmd.count_atoms(pdbcode + " and chain " + chain2 + " within 4.5 of /" + pdbcode + "//" + chain1 + "/" + resid + "/" + atomName)).rjust(5) + line[66:])
+				fo = open(pdbdir + lobe + '_IF_' + pdbcode + '_' + chain1 + '_CBF.pdb','a')
+                                fo.write(line[:60] + str(cmd.count_atoms(pdbcode + " and chain " + chain2 + " within 4.5 of /" + pdbcode + "//" + chain1 + "/" + resid + "/" + atomName)).rjust(6) + line[66:])
 				fo.close()
 	fi.close()
 
