@@ -45,7 +45,7 @@ from findint_lobes import findint
 from CBF import CBF
 from LD import LD
 
-def maltesers(pdbcode,chain1,chain2,reversechains=-1):
+def maltesers(pdbcode,chain1='A',chain2='B',reversechains=-1):
     cmd.disable()
     cmd.set('auto_zoom',0)
     cmd.set('ray_shadows','off')
