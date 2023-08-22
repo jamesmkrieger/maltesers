@@ -1,5 +1,5 @@
 # maltesers
-A set of python scripts for carrying out the dimer interface analysis originally done in  Sukumaran et al., EMBO J 2011
+A set of python pymol scripts for carrying out the dimer interface analysis originally done in  Sukumaran et al., EMBO J 2011
 
 These scripts now allow this analysis to be done in PyMOL and easily generate the final images.
 
