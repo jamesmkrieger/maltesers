@@ -1,5 +1,5 @@
 # maltesers
-A set of python pymol scripts for carrying out the dimer interface analysis originally done in  Sukumaran et al., EMBO J 2011
+A set of python pymol scripts for carrying out the dimer interface analysis originally done in  Sukumaran et al., EMBO J 2011.
 
 These scripts now allow this analysis to be done in PyMOL and easily generate the final images.
 
@@ -14,3 +14,6 @@ These scripts now allow this analysis to be done in PyMOL and easily generate th
     maltesers 4gpa_AB, pdbdir=example
 
 After running the maltesers command in PyMOL, you end up with two images, which can then be combined or overlaid, e.g. in Powerpoint
+
+This gives the following output (available in example):
+![Output](example/maltesers_output_overlay.png)
