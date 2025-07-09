@@ -1,34 +1,41 @@
 ''' module for use in pymol to calculate upper lobe and lower lobe contact numbers
  syntax in pymol is as follows
- CBF pdbcode,chain1,chain2,lobe,reversechains
+ CBF pdbcode, chain1, chain2, lobe, reversechains, pdbdir
 
 reversechains can take 0 or 1 or -1. 0 is the default
 1 means use the chains in the reverse order for the object name e.g. CBF 3saj,C,A,UL,1 would be used if you had an object called 3saj_AC
-0 means don't reverse the order e.g. CBF 3saj,A,C,UL is fine
+0 means don't reverse the order e.g. CBF 3saj,A,C,UL is fine if you have an object called 3saj_AC
 -1 means don't use them at all - maybe your pdb structure only has one dimer so you haven't split it into objects with chain labels e.g. CBF 3hsy,A,B,UL,-1
 '''
-from pymol import *
+import os
+from pymol import cmd
 
-pdbdir = "/home/jkrieger/Documents/pdbs/PBPs/IFs/"
+def CBF(pdbcode, chain1, chain2, lobe, reversechains=0,
+        pdbdir=os.getcwd()):
+    fi = open(os.path.join(pdbdir, lobe + '_IF_' + pdbcode + '_' + chain1 + '.pdb'), 'r')
+    for line in fi:
+        if line.find('ATOM') == 0:
+            resid = line.split()[5]
+            atomName = line.split()[2]
+            if int(reversechains) == 0:
+                fo = open(os.path.join(pdbdir, lobe + '_IF_' + pdbcode + '_' +
+                          chain1 + chain2 + '_' + chain1 + '_CBF.pdb'), 'a')
+                fo.write(line[:60] + str(cmd.count_atoms(pdbcode + "_" + chain1 + chain2 + " and chain " + chain2 + " within 4.5 of /" +
+                         pdbcode + "_" + chain1 + chain2 + "//" + chain1 + "/" + resid + "/" + atomName)).rjust(6) + line[66:])
+                fo.close()
+            elif int(reversechains) == 1:
+                fo = open(os.path.join(pdbdir, lobe + '_IF_' + pdbcode + '_' +
+                          chain2 + chain1 + '_' + chain1 + '_CBF.pdb'), 'a')
+                fo.write(line[:60] + str(cmd.count_atoms(pdbcode + "_" + chain2 + chain1 + " and chain " + chain2 + " within 4.5 of /" +
+                         pdbcode + "_" + chain2 + chain1 + "//" + chain1 + "/" + resid + "/" + atomName)).rjust(6) + line[66:])
+                fo.close()
+            elif int(reversechains) == -1:
+                fo = open(os.path.join(pdbdir, lobe + '_IF_' + pdbcode +
+                          '_' + chain1 + '_CBF.pdb'), 'a')
+                fo.write(line[:60] + str(cmd.count_atoms(pdbcode + " and chain " + chain2 + " within 4.5 of /" +
+                         pdbcode + "//" + chain1 + "/" + resid + "/" + atomName)).rjust(6) + line[66:])
+                fo.close()
+    fi.close()
 
-def CBF(pdbcode,chain1,chain2,lobe,reversechains=0):
-	fi = open(pdbdir + lobe + '_IF_' + pdbcode + '_' + chain1 + '.pdb','r')
-	for line in fi:
-		if line.find('ATOM') == 0:
-			resid = line.split()[5]
-			atomName = line.split()[2]
-			if int(reversechains) == 0:
-				fo = open(pdbdir + lobe + '_IF_' + pdbcode + '_' + chain1 + chain2 + '_' + chain1 + '_CBF.pdb','a')
-				fo.write(line[:60] + str(cmd.count_atoms(pdbcode + "_" + chain1 + chain2 + " and chain " + chain2 + " within 4.5 of /" + pdbcode + "_" + chain1 + chain2 + "//" + chain1 + "/" + resid + "/" + atomName)).rjust(6) + line[66:])
-				fo.close()
-			elif int(reversechains) == 1:
-                                fo = open(pdbdir + lobe + '_IF_' + pdbcode + '_' + chain2 + chain1 + '_' + chain1 + '_CBF.pdb','a')
-                                fo.write(line[:60] + str(cmd.count_atoms(pdbcode + "_" + chain2 + chain1 + " and chain " + chain2 + " within 4.5 of /" + pdbcode + "_" + chain2 + chain1 + "//" + chain1 + "/" + resid + "/" + atomName)).rjust(6) + line[66:])
-				fo.close()
-			elif int(reversechains) == -1:
-				fo = open(pdbdir + lobe + '_IF_' + pdbcode + '_' + chain1 + '_CBF.pdb','a')
-                                fo.write(line[:60] + str(cmd.count_atoms(pdbcode + " and chain " + chain2 + " within 4.5 of /" + pdbcode + "//" + chain1 + "/" + resid + "/" + atomName)).rjust(6) + line[66:])
-				fo.close()
-	fi.close()
 
-cmd.extend("CBF",CBF)
+cmd.extend("CBF", CBF)
